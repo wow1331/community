@@ -1,0 +1,81 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head}">
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" th:replace="~{fragments/common :: menu('board')}">
+</nav>
+
+<main class="container">
+
+  <!-- 게시판 헤더 -->
+  <div class="d-flex justify-content-between align-items-center my-3">
+    <h2 class="m-0">게시판</h2>
+  </div>
+
+  <!-- 검색창 -->
+  <div class="d-flex justify-content-end mb-3">
+    <form class="row g-3">
+      <div class="col-auto">
+        <label for="searchText" class="visually-hidden">검색</label>
+        <input type="text" class="form-control" id="searchText" name="searchText" th:value="${param.searchText}">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-secondary mb-3">검색</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 게시판 목록 -->
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+      <tr>
+        <th scope="col">번호</th>
+        <th scope="col">제목</th>
+        <th scope="col">글쓴이</th>
+        <th scope="col">작성일</th>
+        <th scope="col">조회</th>
+        <th scope="col">추천</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="board : ${boards}">
+        <td th:text="${board.id}"></td>
+        <td>
+          <a th:text="${board.title}" th:href="@{/board/view(id=${board.id})}"></a>
+        </td>
+        <td th:text="${board.user.username}"></td>
+        <td th:text="${board.date}"></td>
+        <td th:text="${board.hit}"></td>
+        <td th:text="${board.recommend}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${1 == boards.pageable.pageNumber + 1} ? 'disabled'">
+        <a class="page-link" th:href="@{/board/list(page=${boards.pageable.pageNumber-1}, searchText=${param.searchText})}">이전</a>
+      </li>
+      <li class="page-item" th:each="i: ${#numbers.sequence(startPage, endPage)}"
+          th:classappend="${i == boards.pageable.pageNumber + 1} ? 'active'"
+          th:if="${i >=  boards.pageable.pageNumber-5 and i <=  boards.pageable.pageNumber+5}">
+        <a class="page-link" th:href="@{/board/list(page=${i-1}, searchText=${param.searchText})}" th:text="${i}"></a>
+      </li>
+      <li class="page-item" th:classappend="${boards.totalPages == boards.pageable.pageNumber + 1} ? 'disabled'">
+        <a class="page-link" th:href="@{/board/list(page=${boards.pageable.pageNumber+1}, searchText=${param.searchText})}">다음</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- 글쓰기 버튼 -->
+  <div class="d-flex justify-content-end">
+    <a type="button" class="btn btn-primary" href="/board/form">쓰기</a>
+  </div>
+
+</main>
+</body>
+</html>
